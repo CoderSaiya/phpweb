@@ -2,6 +2,8 @@
     "require": {
         "phpmailer/phpmailer": "^6.9",
         "stripe/stripe-php": "^15.8",
-        "firebase/php-jwt": "^6.10"
+        "firebase/php-jwt": "^6.10",
+        "endroid/qr-code": "4.0",
+        "guzzlehttp/guzzle": "^7.9"
     }
 }

@@ -22,7 +22,7 @@ if (isset($_COOKIE['username'])) {
     $stmt->close();
 
     $address = [];
-    $userInfoSql = "SELECT * FROM users A JOIN address B ON A.user_id = B.user_id WHERE username = '$username'";
+    $userInfoSql = "SELECT * FROM users A LEFT JOIN address B ON A.user_id = B.user_id WHERE username = '$username'";
     $result = $conn->query($userInfoSql);
     $row = $result->fetch_assoc();
     $fName = $row['first_name'];

@@ -6,35 +6,52 @@ if (!isset($_COOKIE['username'])) {
 
 $username = $_COOKIE['username'];
 
-$userInfoSql = "SELECT * FROM users A JOIN address B ON A.user_id = B.user_id WHERE username = '$username'";
-$result = $conn->query($userInfoSql);
+$userInfoSql = "SELECT A.*, B.*, A.user_id as user_id FROM users A LEFT JOIN address B ON A.user_id = B.user_id WHERE A.username = ?";
+$stmt = $conn->prepare($userInfoSql);
+$stmt->bind_param("s", $username);
 
-if ($result && $result->num_rows > 0) {
-    $userInfo = $result->fetch_assoc();
-    $user_id = $userInfo['user_id'];
+if ($stmt->execute()) {
+    $result = $stmt->get_result();
 
-    $countSql = "SELECT COUNT(*) as count FROM cart WHERE user_id = $user_id";
-    $result = $conn->query($countSql);
-    if ($result) {
-        $row = $result->fetch_assoc();
-        $countCart = $row['count'];
-    } else {
-        die("Lỗi khi đếm giỏ hàng: " . $conn->error);
-    }
+    if ($result && $result->num_rows > 0) {
+        $userInfo = $result->fetch_assoc();
+        $user_id = $userInfo['user_id'];
 
-    $cartSql = "SELECT * FROM cart A JOIN products B ON A.product_id = B.product_id WHERE A.user_id = $user_id";
-    $result = $conn->query($cartSql);
-    $productList = [];
+        if (!isset($user_id) || empty($user_id)) {
+            die("Lỗi: user_id không hợp lệ. Vui lòng kiểm tra cơ sở dữ liệu để xác nhận user_id.");
+        }
 
-    if ($result) {
-        while ($row = $result->fetch_assoc()) {
-            $productList[] = $row;
+        $countSql = "SELECT COUNT(*) as count FROM cart WHERE user_id = ?";
+        $countStmt = $conn->prepare($countSql);
+        $countStmt->bind_param("i", $user_id);
+
+        if ($countStmt->execute()) {
+            $countResult = $countStmt->get_result();
+            $row = $countResult->fetch_assoc();
+            $countCart = $row['count'];
+        } else {
+            die("Lỗi khi đếm giỏ hàng: " . $conn->error);
+        }
+
+        $cartSql = "SELECT * FROM cart A JOIN products B ON A.product_id = B.product_id WHERE A.user_id = ?";
+        $cartStmt = $conn->prepare($cartSql);
+        $cartStmt->bind_param("i", $user_id);
+
+        if ($cartStmt->execute()) {
+            $cartResult = $cartStmt->get_result();
+            $productList = [];
+
+            while ($row = $cartResult->fetch_assoc()) {
+                $productList[] = $row;
+            }
+        } else {
+            die("Lỗi khi lấy sản phẩm trong giỏ hàng: " . $conn->error);
         }
     } else {
-        die("Lỗi khi lấy sản phẩm trong giỏ hàng: " . $conn->error);
+        die("Không tìm thấy người dùng với username: $username");
     }
 } else {
-    die("Không tìm thấy người dùng.");
+    die("Lỗi truy vấn cơ sở dữ liệu: " . $conn->error);
 }
 ?>
 
@@ -554,10 +571,13 @@ if ($result && $result->num_rows > 0) {
                     </div>
                     <div class="payment__types">
                         <div class="payment__type payment__type--cc active" data-method="stripe">
-                            <i class='bx bxs-credit-card'></i></i>Thẻ Visa
+                            <i class='bx bxs-credit-card'></i></i>Thanh toán bằng thẻ Visa
                         </div>
                         <div class="payment__type payment__type--paypal" data-method="cod">
                             <i class='bx bx-money'></i>Thanh toán khi nhận hàng
+                        </div>
+                        <div class="payment__type payment__type--momo" data-method="momo">
+                            <i class="bx bxs-qrcode"></i> Thanh toán bằng MoMo
                         </div>
                     </div>
 

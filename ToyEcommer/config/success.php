@@ -110,6 +110,7 @@ if ($session->payment_status == 'paid') {
 
     sendOrderConfirmationEmail($userInfo['email'], $orderDetails, $products);
     header("Location: ../success_page.php");
+    exit;
 } else {
     die("Thanh toán không thành công. Vui lòng thử lại.");
 }

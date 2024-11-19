@@ -67,7 +67,7 @@ function sendOrderConfirmationEmail($recipientEmail, $orderDetails, $products)
     $mail->Host       = 'smtp.gmail.com';
     $mail->SMTPAuth   = true;
     $mail->Username   = 'sonysam.contacts@gmail.com';
-    $mail->Password   = 'rlmz fdka kxud ejzx';
+    $mail->Password   = 'lozj jtzu gkzn gxnm';
     $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
     $mail->Port       = 587;
 

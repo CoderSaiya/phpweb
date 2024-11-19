@@ -74,17 +74,27 @@ document.addEventListener("DOMContentLoaded", function () {
 document.addEventListener("DOMContentLoaded", function () {
   const cardPayment = document.querySelector(".payment__type--cc");
   const codPayment = document.querySelector(".payment__type--paypal");
+  const momoPayment = document.querySelector(".payment__type--momo")
 
   cardPayment.addEventListener("click", function () {
     cardPayment.classList.add("active");
     codPayment.classList.remove("active");
+    momoPayment.classList.remove("active")
     document.getElementById("paymentMethod").value = "stripe";
   });
 
   codPayment.addEventListener("click", function () {
     codPayment.classList.add("active");
     cardPayment.classList.remove("active");
+    momoPayment.classList.remove("active")
     document.getElementById("paymentMethod").value = "cod";
+  });
+
+  momoPayment.addEventListener("click", function () {
+    momoPayment.classList.add("active");
+    codPayment.classList.remove("active");
+    cardPayment.classList.remove("active");
+    document.getElementById("paymentMethod").value = "momo";
   });
 });
 
